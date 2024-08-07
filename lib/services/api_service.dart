@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'package:blog_explorer/models/blog.dart';
 import 'package:blog_explorer/secrets/auth_secrets.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String url = 'https://intent-kit-16.hasura.app/api/rest/blogs';
-  
 
   Future<List<Blog>> fetchBlogs() async {
     try {
@@ -20,5 +20,6 @@ class ApiService {
     } catch (e) {
       throw Exception('Error: $e');
     }
+    return [];
   }
 }
