@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'state/bloc_blog.dart';
 import 'services/api_service.dart';
-import 'views/blog_screen.dart';
 import 'views/home.dart';
 
 void main() {
@@ -12,6 +11,8 @@ void main() {
 
 class BlogExplorerApp extends StatelessWidget {
   final ApiService apiService = ApiService();
+
+  BlogExplorerApp({super.key});
 
   @override
   Widget build(BuildContext context) {

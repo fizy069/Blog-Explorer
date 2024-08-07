@@ -1,4 +1,4 @@
-// lib/bloc/blog_bloc.dart
+//bloc integration..
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../models/blog.dart';

@@ -1,8 +1,7 @@
-// lib/screens/blog_list_screen.dart
+//needs ui changes
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../state/bloc_blog.dart';
-import '../models/blog.dart';
 import 'blog_screen.dart';
 
 class Home extends StatelessWidget {
