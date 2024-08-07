@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../state/bloc_blog.dart';
 import '../models/blog.dart';
-import '../views/blog_screen.dart';
+import 'blog_screen.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -22,8 +22,8 @@ class Home extends StatelessWidget {
               itemBuilder: (context, index) {
                 final blog = state.blogs[index];
                 return ListTile(
-                  leading: Image.network(blog.imageUrl, width: 50, height: 50, fit: BoxFit.cover),
                   title: Text(blog.title),
+                  leading: Image.network(blog.imageUrl),
                   onTap: () {
                     Navigator.push(
                       context,

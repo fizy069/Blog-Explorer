@@ -13,13 +13,13 @@ class ApiService {
       });
 
       if (response.statusCode == 200) {
-        //neeed to convert the response body to a List of blogs
+        final List<dynamic> data = json.decode(response.body)['blogs'];
+        return data.map((json) => Blog.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load blogs');
       }
     } catch (e) {
       throw Exception('Error: $e');
     }
-    return [];
   }
 }

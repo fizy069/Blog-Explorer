@@ -12,6 +12,7 @@ abstract class BlogEvent extends Equatable {
 
 class FetchBlogs extends BlogEvent {}
 
+
 abstract class BlogState extends Equatable {
   @override
   List<Object> get props => [];
@@ -39,21 +40,21 @@ class BlogError extends BlogState {
   List<Object> get props => [message];
 }
 
+
 class BlogBloc extends Bloc<BlogEvent, BlogState> {
   final ApiService apiService;
 
-  BlogBloc(this.apiService) : super(BlogInitial());
+  BlogBloc(this.apiService) : super(BlogInitial()) {
+    on<FetchBlogs>(_onFetchBlogs);
+  }
 
-  @override
-  Stream<BlogState> mapEventToState(BlogEvent event) async* {
-    if (event is FetchBlogs) {
-      yield BlogLoading();
-      try {
-        final blogs = await apiService.fetchBlogs();
-        yield BlogLoaded(blogs);
-      } catch (e) {
-        yield BlogError(e.toString());
-      }
+  void _onFetchBlogs(FetchBlogs event, Emitter<BlogState> emit) async {
+    emit(BlogLoading());
+    try {
+      final blogs = await apiService.fetchBlogs();
+      emit(BlogLoaded(blogs));
+    } catch (e) {
+      emit(BlogError(e.toString()));
     }
   }
 }
