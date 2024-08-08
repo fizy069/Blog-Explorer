@@ -73,7 +73,7 @@ class Home extends StatelessWidget {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    blog.title,
+                                    'Dummy Description for ${blog.title}',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[700],
@@ -103,6 +103,7 @@ class Home extends StatelessWidget {
           return Center(child: Text('Press the button to fetch blogs'));
         },
       ),
+      backgroundColor: Colors.grey[100], // Background color added here
     );
   }
 }

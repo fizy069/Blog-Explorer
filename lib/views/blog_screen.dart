@@ -43,7 +43,7 @@ class BlogDetailScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Published on 08/08/2024',  // Assuming you have a publishedDate property
+                    'Published on 08/08/2024', 
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -73,6 +73,7 @@ class BlogDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+      backgroundColor: Colors.grey[100], // Background color added here
     );
   }
 }
