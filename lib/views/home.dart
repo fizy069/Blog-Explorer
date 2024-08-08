@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../state/bloc_blog.dart';
 import 'blog_screen.dart';
 
@@ -7,8 +8,8 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Blog Explorer', style: TextStyle(fontWeight: FontWeight.bold)),
+     appBar: AppBar(
+        title: const Text('Subspace : Blog Explorer', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.teal,
         centerTitle: true,
         elevation: 0,
@@ -16,94 +17,115 @@ class Home extends StatelessWidget {
       body: BlocBuilder<BlogBloc, BlogState>(
         builder: (context, state) {
           if (state is BlogLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (state is BlogLoaded) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<BlogBloc>().add(FetchBlogs());
-              },
-              child: ListView.builder(
-                itemCount: state.blogs.length,
-                itemBuilder: (context, index) {
-                  final blog = state.blogs[index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(15),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlogDetailScreen(blog: blog),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                blog.imageUrl,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    blog.title,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.teal[900],
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Dummy Description for ${blog.title}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+            if (state.blogs.isEmpty) {
+              return _buildEmptyState();
+            }
+            return ListView.builder(
+              itemCount: state.blogs.length,
+              itemBuilder: (context, index) {
+                final blog = state.blogs[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    leading: _buildImage(blog.imageUrl), 
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlogDetailScreen(blog: blog),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                );
+              },
             );
           } else if (state is BlogError) {
-            return Center(
-              child: Text(
-                state.message,
-                style: TextStyle(color: Colors.red, fontSize: 18),
-              ),
-            );
+            return _buildErrorState(state.message);
           }
-          return Center(child: Text('Press the button to fetch blogs'));
+          return const Center(child: Text('Press the button to fetch blogs'));
         },
       ),
-      backgroundColor: Colors.grey[100], // Background color added here
+    );
+  }
+
+  Widget _buildImage(String imageUrl) {
+  return FutureBuilder<bool>(
+    future: _checkConnectivity(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const SizedBox(
+          width: 50,
+          height: 50,
+          child: CircularProgressIndicator(), 
+        );
+      }
+      if (snapshot.hasData && snapshot.data == false) {
+        return Image.asset('assets/placeholder.jpg', width: 50, height: 50); 
+      }
+      return Image.network(
+        imageUrl,
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset('assets/placeholder.jpg', width: 50, height: 50);
+        },
+      );
+    },
+  );
+}
+
+
+  Future<bool> _checkConnectivity() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    return connectivityResult != ConnectivityResult.none; 
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.article, size: 80, color: Colors.grey),
+          SizedBox(height: 16),
+          Text(
+            'No Blogs Available',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Please check back later.',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error, size: 80, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Please try again later.',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
     );
   }
 }

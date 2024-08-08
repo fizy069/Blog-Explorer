@@ -1,28 +1,31 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'state/bloc_blog.dart';
-import 'services/api_service.dart';
-import 'views/home.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'services/api_service.dart'; 
+import 'state/bloc_blog.dart'; 
+import 'models/blog.dart'; 
+import 'views/home.dart'; 
 
-void main() {
-  runApp(BlogExplorerApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(BlogAdapter());
+  await Hive.openBox<Blog>('blogBox');
+
+  runApp(MyApp());
 }
 
-class BlogExplorerApp extends StatelessWidget {
-  final ApiService apiService = ApiService();
-
-  BlogExplorerApp({super.key});
+class MyApp extends StatelessWidget {
+  final ApiService apiService = ApiService(); 
+  final Box<Blog> blogBox = Hive.box<Blog>('blogBox'); 
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Blog Explorer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: BlocProvider(
-        create: (context) => BlogBloc(apiService)..add(FetchBlogs()),
+        create: (context) => BlogBloc(apiService, blogBox)..add(FetchBlogs()),
         child: Home(),
       ),
     );
